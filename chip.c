@@ -1,5 +1,6 @@
 // chip.c
 #include <stdio.h>
+#include <stdlib.h>
 
 // Memory
 //  +---------------+= 0xFFF (4095) End of Chip-8 RAM
@@ -15,7 +16,6 @@
 //  |               |
 //  |               |
 //  |               |
-//  +- - - - - - - -+= 0x600 (1536) Start of ETI 660 Chip-8 programs
 //  |               |
 //  |               |
 //  |               |
@@ -46,14 +46,13 @@ unsigned short PC = 0x200;
 // The stack pointer (SP) can be 8-bit, it is used to point to the topmost level of the stack.
 unsigned char SP = 0x0;
 
-
-//The stack is an array of 16 16-bit values, used to store the address that the interpreter shoud return to when finished with a subroutine. Chip-8 allows for up to 16 levels of nested subroutines.
+// The stack is an array of 16 16-bit values, used to store the address that the interpreter shoud return to when finished with a subroutine. Chip-8 allows for up to 16 levels of nested subroutines.
 
 unsigned short stack[16] = {0};
 
 unsigned char display[64][32] = {0x0};
 
-unsigned char sprites[5][16] =
+unsigned char fonts[5][16] =
     {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
         0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -77,12 +76,24 @@ void init(void)
 {
     // load sprites into intrepretor region
     // region is from 0x000 to 0x200 i.e 0 to 512
-    int ptr = 0x000;
-    for (int i = 0; i < 5; i++)
-    {
-        for (int j = 0; j < 16; j++)
-        {
-            memory[ptr] = sprites[i][j];
+    memcpy(memory, fonts, sizeof(fonts));
+
+    // load rom
+    FILE *rom = NULL;
+    rom = fopen("game", "r"); // game is place holder
+
+    int memptr = 0x200;
+    unsigned char x;
+    if (rom != NULL){
+        while(rom != EOF){
+            x = fgetc(rom);
+            memory[memptr++] = x;
         }
     }
+
+    
+}
+
+void emulation_cycle(void)
+{
 }
