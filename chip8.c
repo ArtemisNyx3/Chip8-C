@@ -28,9 +28,25 @@ void init(void)
 }
 
 void executeCPU(void)
-{
+{   unsigned short opcode;
     // fetch
-    
+    opcode = memory[PC] << 8 | memory[PC + 1]; //Since each opcode is 2 bytes long, we left shift 8 bits to make msb
+   
     // decode
+    switch (opcode)
+    {
+    case 0x00E0: // Clear display
+        for(int i=0; i < 64; i++){
+            for(int j=0;j<32;j++){
+                display[i][j] = 0;
+            }
+        }
+        PC += 2;
+        break;
+    
+    default:
+        break;
+    }
+
     // execute
 }
