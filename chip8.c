@@ -67,35 +67,47 @@ void executeCPU(void)
         PC = opcode & 0x0FFF;
         break;
 
-    case 0x3000:
+    case 0x3000: // 3XNN --- if (Vx == NN)
         if (v[opcode & 0x0F00 >> 8] == opcode & 0x00FF)
             PC += 4;
         else
             PC += 2;
         break;
 
-    case 0x4000:
+    case 0x4000: // 4XNN --- if (Vx != NN)
         if (v[opcode & 0x0F00 >> 8] != opcode & 0x00FF)
             PC += 4;
         else
             PC += 2;
         break;
 
-    case 0x5000:
+    case 0x5000: // 5XY0 --- if (Vx == Vy)
         if (v[opcode & 0x0F00 >> 8] == v[opcode & 0x00F0 >> 4])
             PC += 4;
         else
             PC += 2;
         break;
 
-    case 0x6000:
+    case 0x6000: // 6XNN --- Vx = NN
         v[opcode & 0x0F00 >> 8] = opcode & 0x00FF;
         PC += 2;
         break;
 
-    case 0x7000:
+    case 0x7000: // 7XNN --- Vx += NN
         v[opcode & 0x0F00 >> 8] += opcode & 0x00FF;
         PC += 2;
+        break;
+
+    case 0x8000:
+        switch (opcode & 0x000F)
+        {
+        case 0x0000: // 8XY0 --- Vx = Vy
+            /* code */
+            break;
+
+        default:
+            break;
+        }
         break;
 
     default:
