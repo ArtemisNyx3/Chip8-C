@@ -61,7 +61,33 @@ void executeCPU(void)
         PC = opcode & 0x0FFF;
         break;
 
+    case 0x2000: // calls subroutine at NNN
+        stack[SP] = PC;
+        SP++;
+        PC = opcode & 0x0FFF;
+        break;
+
+    case 0x3000:
+        if (v[opcode & 0x0F00 >> 8] == opcode & 0x00FF)
+            PC += 4;
+        else
+            PC += 2;
+        break;
+
+    case 0x4000:
+        if (v[opcode & 0x0F00 >> 8] != opcode & 0x00FF)
+            PC += 4;
+        else
+            PC += 2;
+        break;
     
+    case 0x5000:
+            if (v[opcode & 0x0F00 >> 8] == v[opcode & 0x00F0 >> 4])
+            PC += 4;
+        else
+            PC += 2;
+        break;
+
     default:
         break;
     }
