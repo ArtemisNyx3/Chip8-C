@@ -28,21 +28,39 @@ void init(void)
 }
 
 void executeCPU(void)
-{   unsigned short opcode;
+{
+    unsigned short opcode;
     // fetch
-    opcode = memory[PC] << 8 | memory[PC + 1]; //Since each opcode is 2 bytes long, we left shift 8 bits to make msb
-   
+    opcode = memory[PC] << 8 | memory[PC + 1]; // Since each opcode is 2 bytes long, we left shift 8 bits to make msb
+
     // decode
-    switch (opcode)
+    switch (opcode & 0xF000) // isolate the first digit
     {
-    case 0x00E0: // Clear display
-        for(int i=0; i < 64; i++){
-            for(int j=0;j<32;j++){
-                display[i][j] = 0;
+    case 0x0000:
+        switch (opcode)
+        {
+        case 0x00E0: // clear display
+            for (int i = 0; i < 64; i++)
+            {
+                for (int j = 0; j < 32; j++)
+                {
+                    display[i][j] = 0;
+                }
             }
+            PC += 2;
+            break;
+
+        case 0x00EE:        // return
+            SP--;           // prev layer of stack
+            PC = stack[SP]; // update pc
+            PC += 2;        // next instruction
+            break;
         }
-        PC += 2;
+
+    case 0x1000: // goto NNN
+        PC = opcode & 0x0FFF;
         break;
+
     
     default:
         break;
