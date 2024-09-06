@@ -105,6 +105,39 @@ void executeCPU(void)
             /* code */
             break;
 
+        case 0x0001: // 8XY1 --- Vx = Vx | Vy
+            /* code */
+            break;
+
+        case 0x0002: // 8XY2 --- Vx = Vx & Vy
+            /* code */
+            break;
+
+        case 0x0003: // 8XY3 --- Vx = Vx ^ Vy
+            /* code */
+            break;
+
+        case 0x0004: // 8XY4 --- Vx = Vx + Vy
+            /* code */
+            break;
+
+        case 0x0005: // 8XY5 --- Vx = Vx - Vy
+            /* code */
+            break;
+
+        case 0x0006: // 8XY6 --- Vx >>= 1
+                     // Shifts VX to the right by 1, then stores the least significant bit of VX prior to the shift into VF
+            /* code */
+            break;
+
+        case 0x0007: // 8XY7 --- Vx = Vy - Vx
+            /* code */
+            break;
+
+        case 0x000E: // 8XYE --- Vx <<= 1
+            /* code */
+            break;
+
         default:
             break;
         }
