@@ -80,12 +80,22 @@ void executeCPU(void)
         else
             PC += 2;
         break;
-    
+
     case 0x5000:
-            if (v[opcode & 0x0F00 >> 8] == v[opcode & 0x00F0 >> 4])
+        if (v[opcode & 0x0F00 >> 8] == v[opcode & 0x00F0 >> 4])
             PC += 4;
         else
             PC += 2;
+        break;
+
+    case 0x6000:
+        v[opcode & 0x0F00 >> 8] = opcode & 0x00FF;
+        PC += 2;
+        break;
+
+    case 0x7000:
+        v[opcode & 0x0F00 >> 8] += opcode & 0x00FF;
+        PC += 2;
         break;
 
     default:
