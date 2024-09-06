@@ -8,7 +8,6 @@ extern unsigned char v[16] = {0x0};
 
 extern unsigned short I = 0x0;
 
-extern unsigned char vf = 0x0;
 
 extern unsigned char DT = 0x3c; // 0x3c = 60;
 extern unsigned char ST = 0x0;

@@ -102,40 +102,65 @@ void executeCPU(void)
         switch (opcode & 0x000F)
         {
         case 0x0000: // 8XY0 --- Vx = Vy
-            /* code */
+            v[opcode & 0x0F00 >> 8] = v[opcode & 0x00F0 >> 4];
+            PC += 2;
             break;
 
         case 0x0001: // 8XY1 --- Vx = Vx | Vy
-            /* code */
+            v[opcode & 0x0F00 >> 8] = v[opcode & 0x0F00 >> 8] | v[opcode & 0x00F0 >> 4];
+            PC += 2;
             break;
 
         case 0x0002: // 8XY2 --- Vx = Vx & Vy
-            /* code */
+            v[opcode & 0x0F00 >> 8] = v[opcode & 0x0F00 >> 8] & v[opcode & 0x00F0 >> 4];
+            PC += 2;
             break;
 
         case 0x0003: // 8XY3 --- Vx = Vx ^ Vy
-            /* code */
+            v[opcode & 0x0F00 >> 8] = v[opcode & 0x0F00 >> 8] ^ v[opcode & 0x00F0 >> 4];
+            PC += 2;
             break;
 
-        case 0x0004: // 8XY4 --- Vx = Vx + Vy
-            /* code */
+        case 0x0004:                                                      // 8XY4 --- Vx = Vx + Vy
+            if (v[opcode & 0x0F00 >> 8] > 0xFF - v[opcode & 0x00F0 >> 4]) // overflow cond
+                v[0xF] = 1;
+            else
+                v[0xF] = 0;
+            v[opcode & 0x0F00 >> 8] = v[opcode & 0x0F00 >> 8] + v[opcode & 0x00F0 >> 4];
+            PC += 2;
             break;
 
-        case 0x0005: // 8XY5 --- Vx = Vx - Vy
-            /* code */
+        case 0x0005:                                               // 8XY5 --- Vx = Vx - Vy
+            if (v[opcode & 0x0F00 >> 8] < v[opcode & 0x00F0 >> 4]) // undeflow cond
+                v[0xF] = 0;
+            else
+                v[0xF] = 1;
+            v[opcode & 0x0F00 >> 8] = v[opcode & 0x0F00 >> 8] + v[opcode & 0x00F0 >> 4];
+            PC += 2;
             break;
 
         case 0x0006: // 8XY6 --- Vx >>= 1
                      // Shifts VX to the right by 1, then stores the least significant bit of VX prior to the shift into VF
-            /* code */
+
+            v[0xF] = v[opcode & 0x0F00 >> 8] & 0x1;
+            v[opcode & 0x0F00 >> 8] >>= 1;
+            PC += 2;
             break;
 
-        case 0x0007: // 8XY7 --- Vx = Vy - Vx
-            /* code */
+        case 0x0007:                                               // 8XY7 --- Vx = Vy - Vx
+            if (v[opcode & 0x0F00 >> 8] > v[opcode & 0x00F0 >> 4]) // undeflow cond
+                v[0xF] = 0;
+            else
+                v[0xF] = 1;
+            v[opcode & 0x0F00 >> 8] = v[opcode & 0x00F0 >> 4] - v[opcode & 0x0F00 >> 8];
+            PC += 2;
             break;
 
         case 0x000E: // 8XYE --- Vx <<= 1
-            /* code */
+                     // sets VF to Most Significant bit prior to bitshift
+            v[0xF] = v[opcode & 0x0F00 >> 8] >> 7;
+            v[opcode & 0x0F00 >> 8] <<= 1;
+            PC += 2;
             break;
 
         default:
