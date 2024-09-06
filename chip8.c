@@ -168,6 +168,30 @@ void executeCPU(void)
         }
         break;
 
+    case 0x9000: // 9XY0 --- if (Vx != Vy)
+        if (v[opcode & 0x0F00 >> 8] != v[opcode & 0x00F0 >> 4])
+            PC += 4;
+        else
+            PC += 2;
+        break;
+
+    case 0xA000: // ANNN --- I = NNN
+        I = opcode & 0x0FFF;
+        PC += 2;
+        break;
+
+    case 0xB000: // BNNN --- PC = V0 + NNN
+        PC = v[0x0] + (opcode & 0x0FFF);
+        break;
+
+    case 0xC000: // CXNN --- Vx = rand() & NN
+        v[opcode & 0x0F00 >> 8] = (rand() & 0xFF) & (opcode & 0x00FF);
+        PC += 2;
+        break;
+
+    case 0xD000: // DXYN --- draw(Vx, Vy, N)
+        break;
+
     default:
         break;
     }
