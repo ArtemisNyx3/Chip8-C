@@ -3,8 +3,54 @@
 #include <stdlib.h>
 #include "chip8.h"
 
+
+unsigned char fonts[5 * 16] =
+    {
+        0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+        0x20, 0x60, 0x20, 0x20, 0x70, // 1
+        0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+        0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+        0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+        0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+        0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+        0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+        0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+        0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+        0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+        0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+        0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+        0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+        0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+        0xF0, 0x80, 0xF0, 0x80, 0x80  // F
+};
+
+
 void init(void)
 {
+    // initialize variables
+    I = 0x0;
+    PC = 0x200;
+    SP = 0x0;
+
+    DT = 0x3C;
+    ST = 0;
+
+    for (int i = 0; i < 16; i++)
+    {
+        v[i] = stack[i] = 0x0;
+    }
+
+    for (int i = 0; i < 4096; i++)
+        memory[i] = 0x0;
+
+    for (int i = 0; i < 64; i++)
+    {
+        for (int j = 0; j < 32; j++)
+        {
+            display[i][j] = 0x0;
+        }
+    }
+
     // load sprites into intrepretor region
     // region is from 0x000 to 0x200 i.e 0 to 512
     for (int i = 0; i < 5 * 16; i++)
@@ -190,6 +236,16 @@ void executeCPU(void)
         break;
 
     case 0xD000: // DXYN --- draw(Vx, Vy, N)
+                 // Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.
+                 // Each row of 8 pixels is read as bit-coded starting from memory location I;
+                 // I value does not change after the execution of this instruction.
+                 // As described above,
+                 // VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that does not happen.
+        unsigned short x, y, n;
+        x = opcode & 0x0F00 >> 8;
+        y = opcode & 0x00F0 >> 4;
+        n = opcode & 0x000F;
+        unsigned char pixelRow = 0;
         break;
 
     default:

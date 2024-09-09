@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
+#include "chip8.h"
 
 const int WIDTH = 64, HEIGHT = 32, SCALE = 10;
 
@@ -17,18 +18,31 @@ int main(int argc, char *argv[])
     SDL_RenderClear(renderer);
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderDrawPoint(renderer, WIDTH / 2, HEIGHT / 2);
+    // SDL_RenderDrawPoint(renderer, WIDTH / 2, HEIGHT / 2);
 
     SDL_RenderPresent(renderer);
 
-    SDL_Event windowevent;
+    SDL_Event *windowevent;
+    // draw display
 
     while (1)
     {
-        if (SDL_PollEvent(&windowevent))
+        SDL_RenderClear(renderer);
+        for (int i = 0; i < WIDTH; i++)
         {
-            if (SDL_QUIT == windowevent.type)
+            for (int j = 0; j < HEIGHT; j++)
+            {
+                if (display[i][j])
+                    SDL_RenderDrawPoint(renderer, i, j);
+            }
+        }
+
+        if (SDL_PollEvent(windowevent))
+        {
+            if (windowevent->type == SDL_QUIT)
+            {
                 break;
+            }
         }
     }
 
