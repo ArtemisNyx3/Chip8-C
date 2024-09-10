@@ -165,7 +165,7 @@ void executeCPU(void)
             PC += 2;
             break;
 
-        case 0x0004:                                                      // 8XY4 --- Vx = Vx + Vy
+        case 0x0004:                                                          // 8XY4 --- Vx = Vx + Vy
             if (v[(opcode & 0x0F00) >> 8] > 0xFF - v[(opcode & 0x00F0) >> 4]) // overflow cond
                 v[0xF] = 1;
             else
@@ -174,7 +174,7 @@ void executeCPU(void)
             PC += 2;
             break;
 
-        case 0x0005:                                               // 8XY5 --- Vx = Vx - Vy
+        case 0x0005:                                                   // 8XY5 --- Vx = Vx - Vy
             if (v[(opcode & 0x0F00) >> 8] < v[(opcode & 0x00F0) >> 4]) // undeflow cond
                 v[0xF] = 0;
             else
@@ -191,7 +191,7 @@ void executeCPU(void)
             PC += 2;
             break;
 
-        case 0x0007:                                               // 8XY7 --- Vx = Vy - Vx
+        case 0x0007:                                                   // 8XY7 --- Vx = Vy - Vx
             if (v[(opcode & 0x0F00) >> 8] > v[(opcode & 0x00F0) >> 4]) // undeflow cond
                 v[0xF] = 0;
             else
@@ -349,12 +349,20 @@ void executeCPU(void)
 
         case 0x0055: // FX55 --- reg_dump(Vx, &I) --- Stores from V0 to VX (including VX) in memory, starting at address I
                      // The offset from I is increased by 1 for each value written, but I itself is left unmodified.
-            /* code */
+            for (int i = 0; i <= (opcode & 0x0F00) >> 8; i++)
+            {
+                memory[I + i] = v[i];
+            }
+            PC += 2;
             break;
 
         case 0x0065: // FX65 --- reg_load(Vx, &I)] --- Fills from V0 to VX (including VX) with values from memory, starting at address I.
                      // The offset from I is increased by 1 for each value read, but I itself is left unmodified.
-            /* code */
+            for (int i = 0; i <= (opcode & 0x0F00) >> 8; i++)
+            {
+                v[i] = memory[I + i];
+            }
+            PC += 2;
             break;
 
         default:
