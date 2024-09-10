@@ -18,3 +18,4 @@ extern unsigned char SP;
 extern unsigned short stack[16];
 
 extern unsigned char display[64][32];
+extern unsigned char keypad[16];

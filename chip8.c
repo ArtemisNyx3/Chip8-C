@@ -35,7 +35,7 @@ void init(void)
 
     for (int i = 0; i < 16; i++)
     {
-        v[i] = stack[i] = 0x0;
+        v[i] = stack[i] = keypad[i] = 0x0;
     }
 
     for (int i = 0; i < 4096; i++)
@@ -112,33 +112,33 @@ void executeCPU(void)
         break;
 
     case 0x3000: // 3XNN --- if (Vx == NN)
-        if (v[opcode & 0x0F00 >> 8] == opcode & 0x00FF)
+        if (v[(opcode & 0x0F00) >> 8] == opcode & 0x00FF)
             PC += 4;
         else
             PC += 2;
         break;
 
     case 0x4000: // 4XNN --- if (Vx != NN)
-        if (v[opcode & 0x0F00 >> 8] != opcode & 0x00FF)
+        if (v[(opcode & 0x0F00) >> 8] != opcode & 0x00FF)
             PC += 4;
         else
             PC += 2;
         break;
 
     case 0x5000: // 5XY0 --- if (Vx == Vy)
-        if (v[opcode & 0x0F00 >> 8] == v[opcode & 0x00F0 >> 4])
+        if (v[(opcode & 0x0F00) >> 8] == v[(opcode & 0x00F0) >> 4])
             PC += 4;
         else
             PC += 2;
         break;
 
     case 0x6000: // 6XNN --- Vx = NN
-        v[opcode & 0x0F00 >> 8] = opcode & 0x00FF;
+        v[(opcode & 0x0F00) >> 8] = opcode & 0x00FF;
         PC += 2;
         break;
 
     case 0x7000: // 7XNN --- Vx += NN
-        v[opcode & 0x0F00 >> 8] += opcode & 0x00FF;
+        v[(opcode & 0x0F00) >> 8] += opcode & 0x00FF;
         PC += 2;
         break;
 
@@ -146,64 +146,64 @@ void executeCPU(void)
         switch (opcode & 0x000F)
         {
         case 0x0000: // 8XY0 --- Vx = Vy
-            v[opcode & 0x0F00 >> 8] = v[opcode & 0x00F0 >> 4];
+            v[(opcode & 0x0F00) >> 8] = v[(opcode & 0x00F0) >> 4];
             PC += 2;
             break;
 
         case 0x0001: // 8XY1 --- Vx = Vx | Vy
-            v[opcode & 0x0F00 >> 8] = v[opcode & 0x0F00 >> 8] | v[opcode & 0x00F0 >> 4];
+            v[(opcode & 0x0F00) >> 8] = v[(opcode & 0x0F00) >> 8] | v[(opcode & 0x00F0) >> 4];
             PC += 2;
             break;
 
         case 0x0002: // 8XY2 --- Vx = Vx & Vy
-            v[opcode & 0x0F00 >> 8] = v[opcode & 0x0F00 >> 8] & v[opcode & 0x00F0 >> 4];
+            v[(opcode & 0x0F00) >> 8] = v[(opcode & 0x0F00) >> 8] & v[(opcode & 0x00F0) >> 4];
             PC += 2;
             break;
 
         case 0x0003: // 8XY3 --- Vx = Vx ^ Vy
-            v[opcode & 0x0F00 >> 8] = v[opcode & 0x0F00 >> 8] ^ v[opcode & 0x00F0 >> 4];
+            v[(opcode & 0x0F00) >> 8] = v[(opcode & 0x0F00) >> 8] ^ v[(opcode & 0x00F0) >> 4];
             PC += 2;
             break;
 
         case 0x0004:                                                      // 8XY4 --- Vx = Vx + Vy
-            if (v[opcode & 0x0F00 >> 8] > 0xFF - v[opcode & 0x00F0 >> 4]) // overflow cond
+            if (v[(opcode & 0x0F00) >> 8] > 0xFF - v[(opcode & 0x00F0) >> 4]) // overflow cond
                 v[0xF] = 1;
             else
                 v[0xF] = 0;
-            v[opcode & 0x0F00 >> 8] = v[opcode & 0x0F00 >> 8] + v[opcode & 0x00F0 >> 4];
+            v[(opcode & 0x0F00) >> 8] = v[(opcode & 0x0F00) >> 8] + v[(opcode & 0x00F0) >> 4];
             PC += 2;
             break;
 
         case 0x0005:                                               // 8XY5 --- Vx = Vx - Vy
-            if (v[opcode & 0x0F00 >> 8] < v[opcode & 0x00F0 >> 4]) // undeflow cond
+            if (v[(opcode & 0x0F00) >> 8] < v[(opcode & 0x00F0) >> 4]) // undeflow cond
                 v[0xF] = 0;
             else
                 v[0xF] = 1;
-            v[opcode & 0x0F00 >> 8] = v[opcode & 0x0F00 >> 8] + v[opcode & 0x00F0 >> 4];
+            v[(opcode & 0x0F00) >> 8] = v[(opcode & 0x0F00) >> 8] + v[(opcode & 0x00F0) >> 4];
             PC += 2;
             break;
 
         case 0x0006: // 8XY6 --- Vx >>= 1
                      // Shifts VX to the right by 1, then stores the least significant bit of VX prior to the shift into VF
 
-            v[0xF] = v[opcode & 0x0F00 >> 8] & 0x1;
-            v[opcode & 0x0F00 >> 8] >>= 1;
+            v[0xF] = v[(opcode & 0x0F00) >> 8] & 0x1;
+            v[(opcode & 0x0F00) >> 8] >>= 1;
             PC += 2;
             break;
 
         case 0x0007:                                               // 8XY7 --- Vx = Vy - Vx
-            if (v[opcode & 0x0F00 >> 8] > v[opcode & 0x00F0 >> 4]) // undeflow cond
+            if (v[(opcode & 0x0F00) >> 8] > v[(opcode & 0x00F0) >> 4]) // undeflow cond
                 v[0xF] = 0;
             else
                 v[0xF] = 1;
-            v[opcode & 0x0F00 >> 8] = v[opcode & 0x00F0 >> 4] - v[opcode & 0x0F00 >> 8];
+            v[(opcode & 0x0F00) >> 8] = v[(opcode & 0x00F0) >> 4] - v[(opcode & 0x0F00) >> 8];
             PC += 2;
             break;
 
         case 0x000E: // 8XYE --- Vx <<= 1
                      // sets VF to Most Significant bit prior to bitshift
-            v[0xF] = v[opcode & 0x0F00 >> 8] >> 7;
-            v[opcode & 0x0F00 >> 8] <<= 1;
+            v[0xF] = v[(opcode & 0x0F00) >> 8] >> 7;
+            v[(opcode & 0x0F00) >> 8] <<= 1;
             PC += 2;
             break;
 
@@ -213,7 +213,7 @@ void executeCPU(void)
         break;
 
     case 0x9000: // 9XY0 --- if (Vx != Vy)
-        if (v[opcode & 0x0F00 >> 8] != v[opcode & 0x00F0 >> 4])
+        if (v[(opcode & 0x0F00) >> 8] != v[(opcode & 0x00F0) >> 4])
             PC += 4;
         else
             PC += 2;
@@ -229,7 +229,7 @@ void executeCPU(void)
         break;
 
     case 0xC000: // CXNN --- Vx = rand() & NN
-        v[opcode & 0x0F00 >> 8] = (rand() & 0xFF) & (opcode & 0x00FF);
+        v[(opcode & 0x0F00) >> 8] = (rand() & 0xFF) & (opcode & 0x00FF);
         PC += 2;
         break;
 
@@ -240,8 +240,8 @@ void executeCPU(void)
                  // As described above,
                  // VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that does not happen.
         unsigned short x, y, n;
-        x = v[opcode & 0x0F00 >> 8];
-        y = v[opcode & 0x00F0 >> 4];
+        x = v[(opcode & 0x0F00) >> 8];
+        y = v[(opcode & 0x00F0) >> 4];
         n = opcode & 0x000F;
         unsigned char spriteRow;
 
@@ -266,11 +266,18 @@ void executeCPU(void)
         {
         case 0x009E: // EX9E --- if (key() == Vx)
                      // Skips the next instruction if the key stored in VX is pressed
-            /* code */
+            if (keypad[v[(opcode & 0x0F00) >> 8]] == 1)
+                PC += 4;
+            else
+                PC += 2;
             break;
 
         case 0x00A1: // EXA1 --- if (key() != Vx)
                      // Skips the next instruction if the key stored in VX is not pressed
+            if (keypad[v[(opcode & 0x0F00) >> 8]] != 1)
+                PC += 4;
+            else
+                PC += 2;
             break;
 
         default:
@@ -282,38 +289,62 @@ void executeCPU(void)
         switch (opcode & 0x00FF)
         {
         case 0x0007: // FX07 --- Vx = get_delay()  ---  Sets VX to the value of the delay timer.
-            /* code */
+            v[(opcode & 0x0F00) >> 8] = DT;
+            PC += 2;
             break;
 
         case 0x000A: // FX0A --- Vx = get_key()  ---  A key press is awaited, and then stored in VX
                      //(blocking operation, all instruction halted until next key event)
-            /* code */
+            short flg = 1;
+            for (int i = 0; i < 16; i++)
+            {
+                if (keypad[i] == 1)
+                {
+                    v[(opcode & 0x0F00) >> 8] = i;
+                    PC += 2;
+                    flg = 0;
+                }
+            }
+            if (flg)
+                return;
             break;
 
         case 0x0015: // FX15 --- Sets the delay timer to VX
-            /* code */
+            DT = v[(opcode & 0x0F00) >> 8];
+            PC += 2;
             break;
 
         case 0x0018: // FX18 --- Sets the sound timer to VX
-            /* code */
+            ST = v[(opcode & 0x0F00) >> 8];
+            PC += 2;
             break;
 
         case 0x001E: // FX07 --- I += Vx  ---  Adds VX to I. VF is not affected
-            /* code */
+            unsigned short x = (opcode & 0x0F00) >> 8;
+            if (x != 0xF)
+            {
+                I += x;
+            }
+            PC += 2;
             break;
 
         case 0x0029: // FX29 --- I = sprite_addr[Vx] --- Sets I to the location of the sprite for the character in VX.
                      // Characters 0-F (in hexadecimal) are represented by a 4x5 font
-            /* code */
+            I = v[(opcode & 0x0F00) >> 8] * 0x5;
+            PC += 2;
             break;
         case 0x0033: // FX33
                      // set_BCD(Vx)
                      // *(I+0) = BCD(3);
                      // *(I+1) = BCD(2);
                      // *(I+2) = BCD(1);
-                     // Stores the binary-coded decimal representation of VX, with the hundreds digit in memory at location in I,
+                     // Stores the binary-coded decimal representation of VX, with the hundredth digit in memory at location in I,
                      // the tens digit at location I+1, and the ones digit at location I+2.
-            /* code */
+            memory[I] = v[(opcode & 0x0F00) >> 8] / 100;
+            memory[I + 1] = (v[(opcode & 0x0F00) >> 8] / 10);
+            memory[I + 2] = v[(opcode & 0x0F00) >> 8] / 100;
+
+            PC += 2;
             break;
 
         case 0x0055: // FX55 --- reg_dump(Vx, &I) --- Stores from V0 to VX (including VX) in memory, starting at address I
