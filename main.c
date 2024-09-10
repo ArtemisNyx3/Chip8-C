@@ -118,6 +118,79 @@ int main(int argc, char *argv[])
                         break;
                     }
                 }
+
+                if (SDL_KEYUP == event.type)
+                {
+                    switch (event.key.keysym.sym)
+                    {
+                    case SDLK_1: // 1
+                        keypad[0x1] = 0;
+                        break;
+
+                    case SDLK_2: // 2
+                        keypad[0x2] = 0;
+                        break;
+
+                    case SDLK_3: // 3
+                        keypad[0x3] = 0;
+                        break;
+
+                    case SDLK_4: // C
+                        keypad[0xC] = 0;
+                        break;
+
+                    case SDLK_q: // 4
+                        keypad[0x4] = 0;
+                        break;
+
+                    case SDLK_w: // 5
+                        keypad[0x5] = 0;
+                        break;
+
+                    case SDLK_e: // 6
+                        keypad[0x6] = 0;
+                        break;
+
+                    case SDLK_r: // D
+                        keypad[0xD] = 0;
+                        break;
+
+                    case SDLK_a: // 7
+                        keypad[0x7] = 0;
+                        break;
+
+                    case SDLK_s: // 8
+                        keypad[0x8] = 0;
+                        break;
+
+                    case SDLK_d: // 9
+                        keypad[0x9] = 0;
+                        break;
+
+                    case SDLK_f: // E
+                        keypad[0xE] = 0;
+                        break;
+
+                    case SDLK_z: // A
+                        keypad[0xA] = 0;
+                        break;
+
+                    case SDLK_x: // 0
+                        keypad[0x0] = 0;
+                        break;
+
+                    case SDLK_c: // B
+                        keypad[0xB] = 0;
+                        break;
+
+                    case SDLK_v: // F
+                        keypad[0xF] = 0;
+                        break;
+
+                    default:
+                        break;
+                    }
+                }
             }
         }
     }
