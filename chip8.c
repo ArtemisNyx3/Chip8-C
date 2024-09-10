@@ -77,7 +77,7 @@ void executeCPU(void)
     // fetch
     opcode = memory[PC] << 8 | memory[PC + 1]; // Since each opcode is 2 bytes long, we left shift 8 bits to make msb
 
-    // decode
+    // decode & execute
     switch (opcode & 0xF000) // isolate the first digit
     {
     case 0x0000:
@@ -374,5 +374,4 @@ void executeCPU(void)
         break;
     }
 
-    // execute
 }

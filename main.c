@@ -21,8 +21,9 @@ int main(int argc, char *argv[])
     // SDL_RenderDrawPoint(renderer, WIDTH / 2, HEIGHT / 2);
 
     SDL_RenderPresent(renderer);
+    SDL_EnableUNICODE(1);
 
-    SDL_Event *windowevent;
+    SDL_Event event;
     // draw display
 
     while (1)
@@ -37,11 +38,86 @@ int main(int argc, char *argv[])
             }
         }
 
-        if (SDL_PollEvent(windowevent))
+        // input
+        while (1)
         {
-            if (windowevent->type == SDL_QUIT)
+            if (SDL_PollEvent(&event))
             {
-                break;
+                if (SDL_QUIT == event.type)
+                    break;
+
+                if (SDL_KEYDOWN == event.type)
+                {
+                    switch (event.key.keysym.sym)
+                    {
+                    case SDLK_1: // 1
+                        keypad[0x1] = 1;
+                        break;
+
+                    case SDLK_2: // 2
+                        keypad[0x2] = 1;
+                        break;
+
+                    case SDLK_3: // 3
+                        keypad[0x3] = 1;
+                        break;
+
+                    case SDLK_4: // C
+                        keypad[0xC] = 1;
+                        break;
+
+                    case SDLK_q: // 4
+                        keypad[0x4] = 1;
+                        break;
+
+                    case SDLK_w: // 5
+                        keypad[0x5] = 1;
+                        break;
+
+                    case SDLK_e: // 6
+                        keypad[0x6] = 1;
+                        break;
+
+                    case SDLK_r: // D
+                        keypad[0xD] = 1;
+                        break;
+
+                    case SDLK_a: // 7
+                        keypad[0x7] = 1;
+                        break;
+
+                    case SDLK_s: // 8
+                        keypad[0x8] = 1;
+                        break;
+
+                    case SDLK_d: // 9
+                        keypad[0x9] = 1;
+                        break;
+
+                    case SDLK_f: // E
+                        keypad[0xE] = 1;
+                        break;
+
+                    case SDLK_z: // A
+                        keypad[0xA] = 1;
+                        break;
+
+                    case SDLK_x: // 0
+                        keypad[0x0] = 1;
+                        break;
+
+                    case SDLK_c: // B
+                        keypad[0xB] = 1;
+                        break;
+
+                    case SDLK_v: // F
+                        keypad[0xF] = 1;
+                        break;
+
+                    default:
+                        break;
+                    }
+                }
             }
         }
     }
