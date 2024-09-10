@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include "chip8.h"
 
-
 unsigned char fonts[5 * 16] =
     {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -23,7 +22,6 @@ unsigned char fonts[5 * 16] =
         0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
         0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
-
 
 void init(void)
 {
@@ -242,10 +240,95 @@ void executeCPU(void)
                  // As described above,
                  // VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that does not happen.
         unsigned short x, y, n;
-        x = opcode & 0x0F00 >> 8;
-        y = opcode & 0x00F0 >> 4;
+        x = v[opcode & 0x0F00 >> 8];
+        y = v[opcode & 0x00F0 >> 4];
         n = opcode & 0x000F;
-        unsigned char pixelRow = 0;
+        unsigned char spriteRow;
+
+        for (int i = 0; i < n; i++) // y coordinate
+        {
+            spriteRow = memory[I + i];
+            for (int j = 0; j < 8; j++) // x coordinate
+            {
+                int a = x + j, b = y + i;
+                unsigned char newVal = spriteRow & 0x80 >> 7; // get the MSB
+                spriteRow <<= 1;                              // since we got the MSB, left shift to make the next one MSB
+
+                if (display[a][b] == 1 && newVal == 0)
+                    v[0xF] = 1;
+                display[a][b] = newVal;
+            }
+        }
+        break;
+
+    case 0xE000:
+        switch (opcode & 0x00FF)
+        {
+        case 0x009E: // EX9E --- if (key() == Vx)
+                     // Skips the next instruction if the key stored in VX is pressed
+            /* code */
+            break;
+
+        case 0x00A1: // EXA1 --- if (key() != Vx)
+                     // Skips the next instruction if the key stored in VX is not pressed
+            break;
+
+        default:
+            break;
+        }
+        break;
+
+    case 0xF000:
+        switch (opcode & 0x00FF)
+        {
+        case 0x0007: // FX07 --- Vx = get_delay()  ---  Sets VX to the value of the delay timer.
+            /* code */
+            break;
+
+        case 0x000A: // FX0A --- Vx = get_key()  ---  A key press is awaited, and then stored in VX
+                     //(blocking operation, all instruction halted until next key event)
+            /* code */
+            break;
+
+        case 0x0015: // FX15 --- Sets the delay timer to VX
+            /* code */
+            break;
+
+        case 0x0018: // FX18 --- Sets the sound timer to VX
+            /* code */
+            break;
+
+        case 0x001E: // FX07 --- I += Vx  ---  Adds VX to I. VF is not affected
+            /* code */
+            break;
+
+        case 0x0029: // FX29 --- I = sprite_addr[Vx] --- Sets I to the location of the sprite for the character in VX.
+                     // Characters 0-F (in hexadecimal) are represented by a 4x5 font
+            /* code */
+            break;
+        case 0x0033: // FX33
+                     // set_BCD(Vx)
+                     // *(I+0) = BCD(3);
+                     // *(I+1) = BCD(2);
+                     // *(I+2) = BCD(1);
+                     // Stores the binary-coded decimal representation of VX, with the hundreds digit in memory at location in I,
+                     // the tens digit at location I+1, and the ones digit at location I+2.
+            /* code */
+            break;
+
+        case 0x0055: // FX55 --- reg_dump(Vx, &I) --- Stores from V0 to VX (including VX) in memory, starting at address I
+                     // The offset from I is increased by 1 for each value written, but I itself is left unmodified.
+            /* code */
+            break;
+
+        case 0x0065: // FX65 --- reg_load(Vx, &I)] --- Fills from V0 to VX (including VX) with values from memory, starting at address I.
+                     // The offset from I is increased by 1 for each value read, but I itself is left unmodified.
+            /* code */
+            break;
+
+        default:
+            break;
+        }
         break;
 
     default:
