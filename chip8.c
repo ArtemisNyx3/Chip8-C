@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "chip8.h"
 
+void loadRom(char *path);
+
 unsigned char fonts[5 * 16] =
     {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -58,17 +60,8 @@ void init(void)
 
     // load rom
     FILE *rom = NULL;
-    rom = fopen("test_opcode.ch8", "r"); // game is place holder
-    int memptr = mem_start;
-    unsigned char x;
-    if (rom != NULL)
-    {
-        while (rom != EOF)
-        {
-            x = fgetc(rom);
-            memory[memptr++] = x;
-        }
-    }
+    char path[] = "test_opcode.ch8";
+    loadRom(path);
 }
 
 void executeCPU(void)
@@ -372,5 +365,28 @@ void executeCPU(void)
 
     default:
         break;
+    }
+}
+
+void loadRom(char *path)
+{
+    unsigned char buffer[10] = {0};
+    FILE *rom = fopen("test.bin", "rb");
+
+    // read the binary file of unknown size
+    //  each memeory location is 1 byte
+    //  so we read 1 byte at a time
+    //  and store it in the memory array
+    if (rom != NULL)
+    {
+        int memptr = mem_start;
+        while (fread(buffer, 1, 1, rom) != 0)
+        {
+            memory[memptr++] = buffer[0];
+        }
+    }
+    else
+    {
+        printf("Error opening file\n");
     }
 }
