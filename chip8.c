@@ -5,6 +5,23 @@
 
 void loadRom(char *path);
 
+unsigned char memory[4096];
+
+unsigned char v[16];
+
+unsigned short I;
+
+unsigned char DT; // 0x3c = 60;
+unsigned char ST;
+
+unsigned short PC;
+unsigned char SP;
+
+unsigned short stack[16];
+
+unsigned char display[64][32];
+unsigned char keypad[16];
+
 unsigned char fonts[5 * 16] =
     {
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -288,18 +305,21 @@ void executeCPU(void)
 
         case 0x000A: // FX0A --- Vx = get_key()  ---  A key press is awaited, and then stored in VX
                      //(blocking operation, all instruction halted until next key event)
-            short flg = 1;
-            for (int i = 0; i < 16; i++)
+            int flgA;
+            flgA = 1;
+            do
             {
-                if (keypad[i] == 1)
+                for (int i = 0; i < 16; i++)
                 {
-                    v[(opcode & 0x0F00) >> 8] = i;
-                    PC += 2;
-                    flg = 0;
+                    if (keypad[i] == 1)
+                    {
+                        v[(opcode & 0x0F00) >> 8] = i;
+                        PC += 2;
+                        flgA = 0;
+                    }
                 }
-            }
-            if (flg)
-                return;
+            } while (flgA);
+
             break;
 
         case 0x0015: // FX15 --- Sets the delay timer to VX
@@ -313,10 +333,9 @@ void executeCPU(void)
             break;
 
         case 0x001E: // FX07 --- I += Vx  ---  Adds VX to I. VF is not affected
-            unsigned short x = (opcode & 0x0F00) >> 8;
-            if (x != 0xF)
+            if ((opcode & 0x0F00) >> 8 != 0xF)
             {
-                I += x;
+                I += (opcode & 0x0F00) >> 8;
             }
             PC += 2;
             break;
@@ -366,12 +385,17 @@ void executeCPU(void)
     default:
         break;
     }
+    // update timers
+    if (DT > 0)
+        DT--;
+    if (ST > 0)
+        ST--;
 }
 
 void loadRom(char *path)
 {
     unsigned char buffer[10] = {0};
-    FILE *rom = fopen("test.bin", "rb");
+    FILE *rom = fopen(path, "rb");
 
     // read the binary file of unknown size
     //  each memeory location is 1 byte
