@@ -58,7 +58,7 @@ void init(void)
 
     // load rom
     FILE *rom = NULL;
-    rom = fopen("game", "r"); // game is place holder
+    rom = fopen("test_opcode.ch8", "r"); // game is place holder
     int memptr = mem_start;
     unsigned char x;
     if (rom != NULL)
@@ -373,5 +373,4 @@ void executeCPU(void)
     default:
         break;
     }
-
 }

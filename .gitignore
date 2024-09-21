@@ -57,3 +57,5 @@ SDL/
 
 CppProperties.json
 SDL2.dll
+
+*.ch8

@@ -2,11 +2,13 @@
 #include <SDL2/SDL.h>
 #include "chip8.h"
 
-const int WIDTH = 64, HEIGHT = 32, SCALE = 10;
-
+int WIDTH = 64;
+int HEIGHT = 32;
+int SCALE = 10;
 int main(int argc, char *argv[])
 {
-
+    printf("In main!!\n");
+    init();
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
 
@@ -21,13 +23,13 @@ int main(int argc, char *argv[])
     // SDL_RenderDrawPoint(renderer, WIDTH / 2, HEIGHT / 2);
 
     SDL_RenderPresent(renderer);
-    SDL_EnableUNICODE(1);
 
     SDL_Event event;
     // draw display
 
     while (1)
     {
+        printf("Draw Display loop\n");
         SDL_RenderClear(renderer);
         for (int i = 0; i < WIDTH; i++)
         {
